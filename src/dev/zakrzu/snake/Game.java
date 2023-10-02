@@ -75,16 +75,8 @@ public class Game extends Canvas implements Runnable {
         new SpriteSheet("/sprites.png");
         prepareMaps();
         m_map = m_mapList.get(0);
-        //m_map = new Map(64, 64);
-        // m_map = new Map("/maps/org_map.png", "Original Map");
-        // m_map.setRespawn(10, 4);
         m_camera = new Camera(m_input);
         m_camera.setPosition((m_map.getCameraX() << 4) + 8, m_map.getCameraY() << 4);
-        // m_camera.moveFreezed((9 << 4) + 6, 6 << 4);
-        // m_player = new PlayerEntity(m_map.getRespawnX(), m_map.getRespawnY(), m_input);
-        // m_camera.follow(m_player);
-        // m_map.add(m_player);
-        // m_map.generateApples();
 
         addKeyListener(m_input);
     }

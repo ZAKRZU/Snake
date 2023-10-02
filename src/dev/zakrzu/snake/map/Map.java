@@ -9,6 +9,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import dev.zakrzu.snake.entity.AppleEntity;
+import dev.zakrzu.snake.entity.BodyEntity;
 import dev.zakrzu.snake.entity.Entity;
 import dev.zakrzu.snake.entity.PlayerEntity;
 import dev.zakrzu.snake.graphics.Screen;
@@ -119,26 +120,37 @@ public class Map {
         int y = random.nextInt(m_height);
         boolean notAllowed = true;
         PlayerEntity player = null;
+        AppleEntity apple = null;
 
         for (int i = 0; i < m_entities.size(); i++) {
             if (m_entities.get(i) instanceof PlayerEntity) player = (PlayerEntity) m_entities.get(i);
         }
 
         while(notAllowed) {
+            boolean collision = false;
             x = random.nextInt(m_width);
             y = random.nextInt(m_height);
+            apple = new AppleEntity(x << 4, y << 4);
             if (!(getTile(x, y) instanceof GrassTile))
                 continue;
             if (player != null) {
-                if (collisionEntity2(x << 4, y << 4, player))
+                if (player.collisionWithEntity(0, 0, apple))
                     continue;
-                if (player.collisionBodyChecker(x << 4, y << 4))
+                for (int i = 0; i < m_entities.size(); i++) {
+                    Entity e = m_entities.get(i);
+                    if (e instanceof BodyEntity) {
+                        if (((BodyEntity)e).collisionWithEntity(0, 0, apple)) {
+                            collision = true;
+                            continue;
+                        }
+                    }
+                }
+                if (collision)
                     continue;
             }
             notAllowed = false;
         }
 
-        AppleEntity apple = new AppleEntity(x << 4, y << 4);
         add(apple);
     }
 
@@ -185,6 +197,7 @@ public class Map {
     public void add(Entity e) {
         m_entities.add(e);
         e.init(this);
+        e.onWorldAdd();
     }
 
     public void remove(Entity e) {
@@ -207,29 +220,6 @@ public class Map {
         if (x < 0 || x >= m_width || y < 0 || y >= m_height)
             return 0;
         return m_tiles[x + y * m_width];
-    }
-
-    public Entity collisionEntity(int xa, int ya, Entity entity) {
-        Entity ent = null;
-        for (int i = 0; i < m_entities.size(); i++) {
-            Entity body = m_entities.get(i);
-            for (int j = 0; j < 4; j++) {
-                int xt = ((entity.getX() + xa) + (j % 2 * 2) * 5);
-                int yt = ((entity.getY() + ya) + (j / 2 * 2) * 2);
-                if (body.getX() == xt && body.getY() == yt) ent = body;
-            }
-
-        }
-        return ent;
-    }
-
-    public boolean collisionEntity2(int xa, int ya, Entity entity) {
-        for (int j = 0; j < 4; j++) {
-            int xt = ((xa) + (j % 2 * 2) * 5);
-            int yt = ((ya) + (j / 2 * 2) * 2);
-            if (entity.getX() == xt && entity.getY() == yt) return true;
-        }
-        return false;
     }
 
 }

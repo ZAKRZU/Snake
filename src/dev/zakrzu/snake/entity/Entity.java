@@ -24,6 +24,9 @@ public class Entity {
         this.map = map;
     }
 
+    public void onWorldAdd() {
+    }
+
     public int getX() {
         return m_x;
     }

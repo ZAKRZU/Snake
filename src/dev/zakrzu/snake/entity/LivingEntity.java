@@ -22,4 +22,18 @@ public class LivingEntity extends Entity {
         return solid;
     }
 
+    public boolean collisionWithEntity(int xa, int ya, Entity entity) {
+        boolean collided = false;
+        int x = m_x + xa;
+        int y = m_y + ya;
+        int xb = x + 15;
+        int yb = y + 15;
+        if ((x >= entity.getX() && x <= entity.getX() + 15 ||
+        xb >= entity.getX() && xb <= entity.getX() + 15) &&
+        (y >= entity.getY() && y <= entity.getY() + 15 ||
+        yb >= entity.getY() && y <= entity.getY() + 15))
+            collided = true;
+        return collided;
+    }
+
 }

@@ -12,7 +12,7 @@ public class PlayerEntity extends LivingEntity {
     private static final int MOVETICK = 21;
 
     private Sprite m_spriteHead = Sprite.snakeHeadRSprite;
-    private List<BodyEntity> m_body = new ArrayList<BodyEntity>();;
+    private List<BodyEntity> m_body = new ArrayList<BodyEntity>();
     private InputHandler m_input;
     private int px, py;
     private int m_dir = 1;
@@ -25,19 +25,21 @@ public class PlayerEntity extends LivingEntity {
 
     public PlayerEntity(InputHandler input) {
         m_input = input;
-        init2();
     }
 
     public PlayerEntity(int x, int y,InputHandler input) {
         m_input = input;
         m_x = x << 4;
         m_y = y << 4;
-        init2();
     }
 
-    public void init2() {
-        m_body.add(new BodyEntity(m_x - (16), m_y, this));
-        m_body.add(new BodyEntity(m_x - (2 * 16), m_y, this));
+    public void onWorldAdd() {
+        BodyEntity bEnt1 = new BodyEntity(m_x - (16), m_y, this);
+        BodyEntity bEnt2 = new BodyEntity(m_x - (2 * 16), m_y, this);
+        m_body.add(bEnt1);
+        m_body.add(bEnt2);
+        map.add(bEnt1);
+        map.add(bEnt2);
     }
 
     public int getDirection() {
@@ -55,7 +57,6 @@ public class PlayerEntity extends LivingEntity {
     public void update() {
         if (m_delay > 0) {m_delay--; return;}
         if (m_isDead) return;
-        //updates--;
         m_updates--;
 
         int xa = 0;
@@ -78,12 +79,14 @@ public class PlayerEntity extends LivingEntity {
         if (m_updates == 0) {
             m_updates = MOVETICK;
             m_lastDir = m_dir;
-            if (collsision((px * 16), (py * 16))) {m_isDead = true; return;}
-            if (collisionBody((px * 16), (py * 16))) {m_isDead = true; return;}
+            if (collsision((px * 16), (py * 16))) {m_isDead = true; m_delay = 15; return;}
+            if (collisionWithBody((px * 16), (py * 16))) {m_isDead = true; m_delay = 15; return;}
             if (m_extend) {
                 BodyEntity l = m_body.get(m_body.size() - 1);
+                BodyEntity n = new BodyEntity(l.getX(), l.getY(), l);
                 m_extend = false;
-                m_body.add(new BodyEntity(l.getX(), l.getY(), l));
+                m_body.add(n);
+                map.add(n);
             }
 
             for (int i = 0; i < m_body.size(); i++) {
@@ -107,7 +110,7 @@ public class PlayerEntity extends LivingEntity {
             for (int i = 0; i < map.getEntities().size(); i++) {
                 Entity e = map.getEntities().get(i);
                 if (e instanceof AppleEntity) {
-                    if ((m_x >> 4) == (e.getX() >> 4) && (m_y >> 4) == (e.getY() >> 4)) {
+                    if (this.collisionWithEntity(0, 0, e)) {
                         ((AppleEntity) e).remove();
                         map.generateApples();
                         m_extend = true;
@@ -118,26 +121,14 @@ public class PlayerEntity extends LivingEntity {
         }
     }
 
-    public boolean collisionBody(int xa, int ya) {
+    public boolean collisionWithBody(int xa, int ya) {
         boolean solid = false;
-        for (int i = 0; i < m_body.size(); i++) {
-            BodyEntity body = m_body.get(i);
-            for (int j = 0; j < 4; j++) {
-                int xt = ((m_x + xa) + (j % 2 * 2) * 5);
-                int yt = ((m_y + ya) + (j / 2 * 2) * 2);
-                if (body.getX() == xt && body.getY() == yt) solid = true;
+        for (int i = 0; i < map.getEntities().size(); i++) {
+            Entity ent = map.getEntities().get(i);
+            if (ent instanceof BodyEntity) {
+                if (collisionWithEntity(xa, ya, ent))
+                    solid = true;
             }
-
-        }
-        return solid;
-    }
-
-    public boolean collisionBodyChecker(int xa, int ya) {
-        boolean solid = false;
-        for (int i = 0; i < m_body.size(); i++) {
-            BodyEntity body = m_body.get(i);
-            if (body.getX() == xa && body.getY() == ya) solid = true;
-
         }
         return solid;
     }
@@ -166,7 +157,6 @@ public class PlayerEntity extends LivingEntity {
             else
             m_body.get(i).render(screen, false);
         }
-        //screen.renderTile(tx, ty, Sprite.snakeTailSprite);
     }
 
 }

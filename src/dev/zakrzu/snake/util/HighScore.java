@@ -14,9 +14,6 @@ public class HighScore implements Serializable {
     }
 
     public void addNewScore(Score score) {
-        // if (m_scoreList.size() > 0)
-        //     if (score.getScore() < m_scoreList.get(m_scoreList.size() - 1).getScore()) return;
-        //HighScoreDialog hs = new HighScoreDialog(score);
         m_scoreList.add(score);
         sortScores();
         cleanOldScores();
@@ -34,10 +31,6 @@ public class HighScore implements Serializable {
     public void cleanOldScores() {
         if (m_scoreList.size() <= TOP) return;
         List<Score> topScores = getTopScores();
-        for (int i = 0; i < topScores.size(); i++) {
-            System.out.println(topScores.get(i).getName() + " " + topScores.get(i).getScore());
-        }
-        //m_scoreList.clear();
         m_scoreList = topScores;
         sortScores();
     }
