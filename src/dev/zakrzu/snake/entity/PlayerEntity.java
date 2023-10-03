@@ -9,7 +9,7 @@ import dev.zakrzu.snake.input.InputHandler;
 
 public class PlayerEntity extends LivingEntity {
     
-    private static final int MOVETICK = 21;
+    private static final int MOVE_TICK = 21;
 
     private Sprite m_spriteHead = Sprite.snakeHeadRSprite;
     private List<BodyEntity> m_body = new ArrayList<BodyEntity>();
@@ -18,7 +18,7 @@ public class PlayerEntity extends LivingEntity {
     private int m_dir = 1;
     private int m_lastDir = m_dir;
     private int m_score = 0;
-    private int m_updates = MOVETICK;
+    private int m_updates = MOVE_TICK;
     private int m_delay = 15;
     private boolean m_extend = false;
     private boolean m_isDead = false;
@@ -77,7 +77,7 @@ public class PlayerEntity extends LivingEntity {
         if (ya < 0) m_dir = 0;
 
         if (m_updates == 0) {
-            m_updates = MOVETICK;
+            m_updates = MOVE_TICK;
             m_lastDir = m_dir;
             if (collsision((px * 16), (py * 16))) {m_isDead = true; m_delay = 15; return;}
             if (collisionWithBody((px * 16), (py * 16))) {m_isDead = true; m_delay = 15; return;}

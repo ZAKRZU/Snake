@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HighScore implements Serializable {
+    
     private static final long serialVersionUID = 1L;
     private static final int TOP = 5;
 
@@ -94,10 +95,6 @@ public class HighScore implements Serializable {
         for (int i = 0; i < arr2.length; i++) {
             m_scoreList.add(arr2[i]);
         }
-    }
-
-    public static HighScore loadHighScores() {
-        return null;
     }
 
 }

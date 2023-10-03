@@ -48,30 +48,30 @@ public class BodyEntity extends LivingEntity {
     public void render(Screen screen, boolean isLast) {
         if (m_dir == 0) {
             if (isLast)
-            snakeSprite = Sprite.snakeTailUSprite;
+                snakeSprite = Sprite.snakeTailUSprite;
             else
-            snakeSprite = Sprite.snakeBodyUSprite;
+                snakeSprite = Sprite.snakeBodyUSprite;
         }
 
         if (m_dir == 1) {
             if (isLast)
-            snakeSprite = Sprite.snakeTailRSprite;
+                snakeSprite = Sprite.snakeTailRSprite;
             else
-            snakeSprite = Sprite.snakeBodyRSprite;
+                snakeSprite = Sprite.snakeBodyRSprite;
         }
         
         if (m_dir == 2) {
             if (isLast)
-            snakeSprite = Sprite.snakeTailDSprite;
+                snakeSprite = Sprite.snakeTailDSprite;
             else
-            snakeSprite = Sprite.snakeBodyDSprite;
+                snakeSprite = Sprite.snakeBodyDSprite;
         }
         
         if (m_dir == 3) {
             if (isLast)
-            snakeSprite = Sprite.snakeTailLSprite;
+                snakeSprite = Sprite.snakeTailLSprite;
             else
-            snakeSprite = Sprite.snakeBodyLSprite;
+                snakeSprite = Sprite.snakeBodyLSprite;
         }
         screen.renderTile(m_x, m_y, snakeSprite);
     }

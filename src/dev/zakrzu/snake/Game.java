@@ -29,7 +29,7 @@ import dev.zakrzu.snake.util.HighScoreDialog;
 import dev.zakrzu.snake.util.Score;
 
 public class Game extends Canvas implements Runnable {
-    
+
     public final static String TITLE = "Snake";
     public final static int WIDTH = 300;
     public final static int HEIGHT = WIDTH / 16 * 10;
@@ -52,7 +52,7 @@ public class Game extends Canvas implements Runnable {
     private UI m_menu;
     private HighScore m_highScore;
     private HighScoreDialog m_highScoreDialog = null;
-    private final String m_saveFileName = "highscores.dat";
+    private static final String SAVE_FILE_NAME = "highscores.dat";
 
     public InputHandler m_input;
 
@@ -65,7 +65,7 @@ public class Game extends Canvas implements Runnable {
         m_input = new InputHandler();
         m_menu = new MainMenuUI(m_input, this);
 
-        File highScoreSave = new File(m_saveFileName);
+        File highScoreSave = new File(SAVE_FILE_NAME);
         if (highScoreSave.exists() && !highScoreSave.isDirectory()) {
             loadObject();
         } else {
@@ -99,7 +99,7 @@ public class Game extends Canvas implements Runnable {
         m_mapList.add(map1);
         m_mapList.add(map2);
         m_mapList.add(map3);
-        //m_mapList.add(mapDebug);
+        // m_mapList.add(mapDebug);
     }
 
     public void startGame() {
@@ -128,14 +128,13 @@ public class Game extends Canvas implements Runnable {
 
     public void loadObject() {
         try {
-            FileInputStream f = new FileInputStream(new File(m_saveFileName));
+            FileInputStream f = new FileInputStream(new File(SAVE_FILE_NAME));
             ObjectInputStream o = new ObjectInputStream(f);
 
-            m_highScore = (HighScore)o.readObject();
+            m_highScore = (HighScore) o.readObject();
 
             o.close();
             f.close();
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -147,14 +146,13 @@ public class Game extends Canvas implements Runnable {
 
     public void saveObject() {
         try {
-            FileOutputStream f = new FileOutputStream(new File(m_saveFileName));
+            FileOutputStream f = new FileOutputStream(new File(SAVE_FILE_NAME));
             ObjectOutputStream o = new ObjectOutputStream(f);
 
             o.writeObject(m_highScore);
 
             o.close();
             f.close();
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -167,24 +165,29 @@ public class Game extends Canvas implements Runnable {
     }
 
     public void start() {
-        if (m_running) return;
+        if (m_running) {
+            return;
+        }
+
         m_running = true;
 
         m_thread = new Thread(this);
         m_thread.start();
-        
+
     }
 
     public void stop() {
-        if (!m_running) return;
+        if (!m_running) {
+            return;
+        }
         saveObject();
         m_running = false;
         System.exit(0);
         // ((JFrame)getParent().getParent().getParent().getParent()).dispose();
         // try {
-        //     m_thread.join();
+        // m_thread.join();
         // } catch (InterruptedException e) {
-        //     e.printStackTrace();
+        // e.printStackTrace();
         // }
     }
 
@@ -215,16 +218,25 @@ public class Game extends Canvas implements Runnable {
             m_pixels[i] = m_screen.m_pixels[i];
         }
         g.drawImage(m_image, 0, 0, getWidth(), getHeight(), null);
-        if (m_menu != null) m_menu.render(m_screen);
+        if (m_menu != null) {
+            m_menu.render(m_screen);
+        }
         if (m_paused) {
-            m_screen.renderText("PAUSED", ((WIDTH * SCALE) / 2) - 64, ((HEIGHT * SCALE) / 2) - 12, 24, 1, 0xffffff);
+            m_screen.renderText("PAUSED",
+                    ((WIDTH * SCALE) / 2) - 64,
+                    ((HEIGHT * SCALE) / 2) - 12,
+                    24, 1, 0xffffff);
         }
         if (m_player != null) {
             m_screen.renderText("Score: " + m_player.getScore(), 0, 0, 24, 1, 0xffffff);
             if (m_player.isDead()) {
-                m_screen.renderText("GAME OVER", ((WIDTH * SCALE) / 2) - 86, ((HEIGHT * SCALE) / 2) - 12, 24, 1, 0xffffff);
+                m_screen.renderText("GAME OVER",
+                        ((WIDTH * SCALE) / 2) - 86,
+                        ((HEIGHT * SCALE) / 2) - 12,
+                        24, 1, 0xffffff);
                 if (m_canRespawn == 0) {
-                    m_screen.renderText("CLICK ANY KEY TO RESTART", ((WIDTH * SCALE) / 2) - 150, ((HEIGHT * SCALE) / 2) + 24, 18, 1, 0xffffff);
+                    m_screen.renderText("CLICK ANY KEY TO RESTART", ((WIDTH * SCALE) / 2) - 150,
+                            ((HEIGHT * SCALE) / 2) + 24, 18, 1, 0xffffff);
                 }
             }
         }
@@ -234,8 +246,10 @@ public class Game extends Canvas implements Runnable {
 
     public void update() {
         m_input.update();
-        if (m_menu != null) m_menu.update();
-        //m_player.update();
+        if (m_menu != null) {
+            m_menu.update();
+        }
+        // m_player.update();
         m_map.update();
         m_camera.update();
         if (m_player != null) {
@@ -245,15 +259,17 @@ public class Game extends Canvas implements Runnable {
             } else if (m_player.isDead()) {
                 Score score = new Score("PLAYER", m_player.getScore());
                 if (m_input.anyKey) {
-                    if (m_highScoreDialog == null && m_highScore.canAddNewScore(score))
+                    if (m_highScoreDialog == null && m_highScore.canAddNewScore(score)) {
                         m_highScoreDialog = new HighScoreDialog(score);
-                    else 
+                    } else {
                         m_canRespawn = -1;
+                    }
                 }
                 if (m_canRespawn == -1) {
                     m_input.releaseAll();
-                    if (m_highScoreDialog != null)
+                    if (m_highScoreDialog != null) {
                         m_highScore.addNewScore(m_highScoreDialog.getScore());
+                    }
                     m_highScoreDialog = null;
                     m_canRespawn = RESPAWN_TIME;
                     m_map.remove(m_player);
@@ -265,13 +281,14 @@ public class Game extends Canvas implements Runnable {
                     saveObject();
                 } else {
                     if (m_highScoreDialog != null) {
-                        if (!m_highScoreDialog.isVisible()) {                            
+                        if (!m_highScoreDialog.isVisible()) {
                             m_canRespawn = -1;
                             m_input.releaseAll();
                         }
                     }
-                    if (m_canRespawn > 0)
+                    if (m_canRespawn > 0) {
                         m_canRespawn--;
+                    }
                 }
             }
         }
@@ -286,13 +303,15 @@ public class Game extends Canvas implements Runnable {
         int frames = 0;
         int updates = 0;
         requestFocus();
-        while(m_running) {
+        while (m_running) {
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
 
             if (delta >= 1) {
-                if (!m_paused) update();
+                if (!m_paused) {
+                    update();
+                }
                 updates++;
                 delta--;
             }
@@ -300,9 +319,9 @@ public class Game extends Canvas implements Runnable {
             render();
             frames++;
 
-            while(System.currentTimeMillis() - lastTimer > 1000) {
+            while (System.currentTimeMillis() - lastTimer > 1000) {
                 lastTimer += 1000;
-                //System.out.println("ups: " + updates + " frames: " + frames);
+                // System.out.println("ups: " + updates + " frames: " + frames);
                 frames = 0;
                 updates = 0;
             }

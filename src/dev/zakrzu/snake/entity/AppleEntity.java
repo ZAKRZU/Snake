@@ -4,6 +4,7 @@ import dev.zakrzu.snake.graphics.Screen;
 import dev.zakrzu.snake.graphics.Sprite;
 
 public class AppleEntity extends Entity {
+    
     private Sprite m_sprite = Sprite.appleSprite;
 
     public AppleEntity() {
