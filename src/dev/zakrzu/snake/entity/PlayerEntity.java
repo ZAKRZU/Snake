@@ -6,10 +6,12 @@ import java.util.List;
 import dev.zakrzu.snake.graphics.Screen;
 import dev.zakrzu.snake.graphics.Sprite;
 import dev.zakrzu.snake.input.InputHandler;
+import dev.zakrzu.snake.util.Score;
 
 public class PlayerEntity extends LivingEntity {
     
     private static final int MOVE_TICK = 21;
+    private static final int RESPAWN_TICK = 30;
 
     private Sprite m_spriteHead = Sprite.snakeHeadRSprite;
     private List<BodyEntity> m_body = new ArrayList<BodyEntity>();
@@ -17,9 +19,10 @@ public class PlayerEntity extends LivingEntity {
     private int px, py;
     private int m_dir = 1;
     private int m_lastDir = m_dir;
-    private int m_score = 0;
+    private Score m_score = null;
     private int m_updates = MOVE_TICK;
     private int m_delay = 15;
+    private int m_respawn = RESPAWN_TICK;
     private boolean m_extend = false;
     private boolean m_isDead = false;
 
@@ -34,6 +37,7 @@ public class PlayerEntity extends LivingEntity {
     }
 
     public void onWorldAdd() {
+        m_score = new Score("Player", 0);
         BodyEntity bEnt1 = new BodyEntity(m_x - (16), m_y, this);
         BodyEntity bEnt2 = new BodyEntity(m_x - (2 * 16), m_y, this);
         m_body.add(bEnt1);
@@ -46,7 +50,7 @@ public class PlayerEntity extends LivingEntity {
         return m_dir;
     }
 
-    public int getScore() {
+    public Score getScore() {
         return m_score;
     }
 
@@ -54,9 +58,18 @@ public class PlayerEntity extends LivingEntity {
         return m_isDead;
     }
 
+    public boolean canRespawn() {
+        return m_respawn == 0;
+    }
+
     public void update() {
         if (m_delay > 0) {m_delay--; return;}
-        if (m_isDead) return;
+        if (m_isDead) {
+            if (m_respawn > 0) {
+                m_respawn--;
+            }
+            return;
+        }
         m_updates--;
 
         int xa = 0;
@@ -114,7 +127,7 @@ public class PlayerEntity extends LivingEntity {
                         ((AppleEntity) e).remove();
                         map.generateApples();
                         m_extend = true;
-                        m_score++;
+                        m_score.addPoints(1);
                     }
                 }
             }

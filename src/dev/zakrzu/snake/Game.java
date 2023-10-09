@@ -26,7 +26,6 @@ import dev.zakrzu.snake.ui.MainMenuUI;
 import dev.zakrzu.snake.ui.UI;
 import dev.zakrzu.snake.util.HighScore;
 import dev.zakrzu.snake.util.HighScoreDialog;
-import dev.zakrzu.snake.util.Score;
 
 public class Game extends Canvas implements Runnable {
 
@@ -228,7 +227,7 @@ public class Game extends Canvas implements Runnable {
                     24, 1, 0xffffff);
         }
         if (m_player != null) {
-            m_screen.renderText("Score: " + m_player.getScore(), 0, 0, 24, 1, 0xffffff);
+            m_screen.renderText("Score: " + m_player.getScore().getScore(), 0, 0, 24, 1, 0xffffff);
             if (m_player.isDead()) {
                 m_screen.renderText("GAME OVER",
                         ((WIDTH * SCALE) / 2) - 86,
@@ -254,42 +253,39 @@ public class Game extends Canvas implements Runnable {
         m_camera.update();
         if (m_player != null) {
             if (m_input.back) {
+                m_highScoreDialog.dispose();
+                m_highScoreDialog = null;
                 stopGame();
 
             } else if (m_player.isDead()) {
-                Score score = new Score("PLAYER", m_player.getScore());
-                if (m_input.anyKey) {
-                    if (m_highScoreDialog == null && m_highScore.canAddNewScore(score)) {
-                        m_highScoreDialog = new HighScoreDialog(score);
-                    } else {
-                        m_canRespawn = -1;
+                if (m_highScoreDialog == null) {
+                    if (m_highScore.canAddNewScore(m_player.getScore())) {
+                        m_highScoreDialog = new HighScoreDialog(this, m_player.getScore());
+                        return;
                     }
-                }
-                if (m_canRespawn == -1) {
-                    m_input.releaseAll();
-                    if (m_highScoreDialog != null) {
-                        m_highScore.addNewScore(m_highScoreDialog.getScore());
-                    }
-                    m_highScoreDialog = null;
-                    m_canRespawn = RESPAWN_TIME;
-                    m_map.remove(m_player);
-                    m_player = new PlayerEntity(m_map.getRespawnX(), m_map.getRespawnY(), m_input);
-                    if (m_map.getCameraFollowsPlayer()) {
-                        m_camera.follow(m_player);
-                    }
-                    m_map.add(m_player);
-                    saveObject();
                 } else {
-                    if (m_highScoreDialog != null) {
-                        if (!m_highScoreDialog.isVisible()) {
-                            m_canRespawn = -1;
-                            m_input.releaseAll();
-                        }
-                    }
-                    if (m_canRespawn > 0) {
-                        m_canRespawn--;
+                    if (m_highScoreDialog.isVisible()) {
+                        return;
                     }
                 }
+
+                if (!m_input.anyKey) {
+                    return;
+                }
+
+
+                if (!m_player.canRespawn()) {
+                    return;
+                }
+
+                m_input.releaseAll();
+                m_highScoreDialog = null;
+                m_map.remove(m_player);
+                m_player = new PlayerEntity(m_map.getRespawnX(), m_map.getRespawnY(), m_input);
+                if (m_map.getCameraFollowsPlayer()) {
+                    m_camera.follow(m_player);
+                }
+                m_map.add(m_player);
             }
         }
     }

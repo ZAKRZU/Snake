@@ -8,6 +8,11 @@ public class Score implements Serializable {
     private String m_playerName;
     private int m_score;
 
+    public Score(String playerName) {
+        m_playerName = playerName;
+        m_score = 0;
+    }
+
     public Score(String playerName, int score) {
         m_playerName = playerName;
         m_score = score;
@@ -19,6 +24,14 @@ public class Score implements Serializable {
 
     public void setName(String playerName) {
         m_playerName = playerName;
+    }
+
+    public void setScore(int score) {
+        m_score = score;
+    }
+
+    public void addPoints(int points) {
+        m_score += points;
     }
 
     public int getScore() {

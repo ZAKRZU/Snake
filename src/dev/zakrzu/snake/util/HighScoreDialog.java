@@ -10,12 +10,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import dev.zakrzu.snake.Game;
+
 public class HighScoreDialog extends JDialog {
     
-    private Score m_score;
-
-    public HighScoreDialog(Score score) {
-        m_score = score;
+    public HighScoreDialog(Game game, Score score) {
         setTitle("New score");
         setLocationRelativeTo(null);
 
@@ -26,14 +25,16 @@ public class HighScoreDialog extends JDialog {
         JLabel nameLabel = new JLabel("Name");
         JTextField nameField = new JTextField(3);
 
-        JLabel scoreLabel = new JLabel("Score " + m_score.getScore());
+        JLabel scoreLabel = new JLabel("Score " + score.getScore());
 
         JButton addScoreButton = new JButton("Add score");
         addScoreButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                m_score.setName(nameField.getText());
+                score.setName(nameField.getText());
+                game.getHighScore().addNewScore(score);
+                game.saveObject();
                 dispose();
             }
             
@@ -47,10 +48,6 @@ public class HighScoreDialog extends JDialog {
         add(panel);
         pack();
         setVisible(true);
-    }
-
-    public Score getScore() {
-        return m_score;
     }
 
 }
