@@ -201,6 +201,7 @@ public class Map {
     }
 
     public void remove(Entity e) {
+        e.onWorldRemove();
         m_entities.remove(e);
     }
 

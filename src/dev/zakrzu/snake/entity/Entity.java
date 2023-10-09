@@ -27,6 +27,9 @@ public class Entity {
     public void onWorldAdd() {
     }
 
+    public void onWorldRemove() {
+    }
+
     public int getX() {
         return m_x;
     }

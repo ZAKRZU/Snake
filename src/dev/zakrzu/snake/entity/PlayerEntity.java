@@ -46,6 +46,12 @@ public class PlayerEntity extends LivingEntity {
         map.add(bEnt2);
     }
 
+    public void onWorldRemove() {
+        for (int i = 0; i < m_body.size(); i++) {
+            map.remove(m_body.get(i));
+        }
+    }
+
     public int getDirection() {
         return m_dir;
     }

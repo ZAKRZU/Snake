@@ -233,7 +233,7 @@ public class Game extends Canvas implements Runnable {
                         ((WIDTH * SCALE) / 2) - 86,
                         ((HEIGHT * SCALE) / 2) - 12,
                         24, 1, 0xffffff);
-                if (m_canRespawn == 0) {
+                if (m_player.canRespawn()) {
                     m_screen.renderText("CLICK ANY KEY TO RESTART", ((WIDTH * SCALE) / 2) - 150,
                             ((HEIGHT * SCALE) / 2) + 24, 18, 1, 0xffffff);
                 }
