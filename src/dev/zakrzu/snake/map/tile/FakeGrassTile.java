@@ -10,8 +10,8 @@ public class FakeGrassTile extends Tile {
     }
 
     @Override
-    public void render(int x, int y, Screen screen) {
-        screen.renderTile(x << 4, y << 4, this);
+    public void render(int xt, int yt, Screen screen) {
+        screen.renderTile(xt << 4, yt << 4, this);
     }
     
 }

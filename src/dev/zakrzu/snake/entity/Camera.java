@@ -4,68 +4,68 @@ import dev.zakrzu.snake.input.InputHandler;
 
 public class Camera extends Entity {
 
-    private InputHandler m_input;
-    private boolean m_freeze = false;
-    private LivingEntity m_followEntity = null;
+    private InputHandler input;
+    private boolean freeze = false;
+    private LivingEntity followEntity = null;
 
     public Camera(InputHandler input) {
-        m_input = input;
+        this.input = input;
     }
 
     public Camera(int x, int y, InputHandler input) {
-        m_input = input;
-        m_x = x;
-        m_y = y;
+        this.input = input;
+        xp = x;
+        yp = y;
     }
 
     public void move(int xa, int ya) {
-        if (m_followEntity == null) return;
+        if (followEntity == null) return;
         // if (xa != 0 && ya != 0) {
         //     move(xa, 0);
         //     move(0, ya);
         // }
 
-        m_x += xa;
-        m_y += ya;
+        xp += xa;
+        yp += ya;
     }
 
     public void moveFreezed(int xa, int ya) {
-        m_x += xa;
-        m_y += ya;
+        xp += xa;
+        yp += ya;
     }
 
     public void setPosition(int xa, int ya) {
-        m_x = xa;
-        m_y = ya;
+        xp = xa;
+        yp = ya;
     }
     
     public void update() {
-        if (m_followEntity != null) {
-            m_x = m_followEntity.getX() + 8;
-            m_y = m_followEntity.getY() + 8;
+        if (followEntity != null) {
+            xp = followEntity.getX() + 8;
+            yp = followEntity.getY() + 8;
             return;
         }
         int xa = 0;
         int ya = 0;
         
-        if (m_input.up) ya--;
-        if (m_input.down) ya++;
-        if (m_input.left) xa--;
-        if (m_input.right) xa++;
+        if (input.up) ya--;
+        if (input.down) ya++;
+        if (input.left) xa--;
+        if (input.right) xa++;
 
         move(xa, ya);
     }
 
     public void follow(LivingEntity e) {
-        m_followEntity = e;
+        followEntity = e;
     }
 
     public void setFreeze(boolean freeze) {
-        m_freeze = freeze;
+        this.freeze = freeze;
     }
 
     public boolean isFreezed() {
-        return m_freeze;
+        return freeze;
     }
 
 }

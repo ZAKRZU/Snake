@@ -8,15 +8,15 @@ public class LivingEntity extends Entity {
         //     move(0, ya);
         // }
 
-        m_x += xa;
-        m_y += ya;
+        xp += xa;
+        yp += ya;
     }
 
     public boolean collsision(int xa, int ya) {
         boolean solid = false;
         for (int i = 0; i < 4; i++) {
-            int xt = ((m_x + xa) + (i % 2 * 2) * 5) >> 4;
-            int yt = ((m_y + ya) + (i / 2 * 2 - 4) * 2) >> 4;
+            int xt = ((xp + xa) + (i % 2 * 2) * 5) >> 4;
+            int yt = ((yp + ya) + (i / 2 * 2 - 4) * 2) >> 4;
             if (map.getTile(xt, yt + 1).solid()) solid = true;
         }
         return solid;
@@ -24,8 +24,8 @@ public class LivingEntity extends Entity {
 
     public boolean collisionWithEntity(int xa, int ya, Entity entity) {
         boolean collided = false;
-        int x = m_x + xa;
-        int y = m_y + ya;
+        int x = xp + xa;
+        int y = yp + ya;
         int xb = x + 15;
         int yb = y + 15;
         if ((x >= entity.getX() && x <= entity.getX() + 15 ||

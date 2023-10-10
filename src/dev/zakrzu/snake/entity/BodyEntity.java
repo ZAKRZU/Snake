@@ -7,34 +7,34 @@ public class BodyEntity extends LivingEntity {
 
     private Sprite snakeSprite;
     private int px, py;
-    private int m_dir;
+    private int dir;
 
     public BodyEntity(int x, int y, PlayerEntity player) {
-        m_x = x;
-        m_y = y;
-        m_dir = player.getDirection();
+        xp = x;
+        yp = y;
+        dir = player.getDirection();
     }
 
     public BodyEntity(int x, int y, BodyEntity body) {
-        m_x = x;
-        m_y = y;
-        m_dir = body.getDirection();
+        xp = x;
+        yp = y;
+        dir = body.getDirection();
     }
 
     public void setDirection(int dir) {
-        m_dir = dir;
+        this.dir = dir;
     }
 
     public int getDirection() {
-        return m_dir;
+        return dir;
     }
 
     public int getX() {
-        return m_x;
+        return xp;
     }
 
     public int getY() {
-        return m_y;
+        return yp;
     }
 
     public int getOldX() {
@@ -46,47 +46,47 @@ public class BodyEntity extends LivingEntity {
     }
 
     public void render(Screen screen, boolean isLast) {
-        if (m_dir == 0) {
+        if (dir == 0) {
             if (isLast)
                 snakeSprite = Sprite.snakeTailUSprite;
             else
                 snakeSprite = Sprite.snakeBodyUSprite;
         }
 
-        if (m_dir == 1) {
+        if (dir == 1) {
             if (isLast)
                 snakeSprite = Sprite.snakeTailRSprite;
             else
                 snakeSprite = Sprite.snakeBodyRSprite;
         }
         
-        if (m_dir == 2) {
+        if (dir == 2) {
             if (isLast)
                 snakeSprite = Sprite.snakeTailDSprite;
             else
                 snakeSprite = Sprite.snakeBodyDSprite;
         }
         
-        if (m_dir == 3) {
+        if (dir == 3) {
             if (isLast)
                 snakeSprite = Sprite.snakeTailLSprite;
             else
                 snakeSprite = Sprite.snakeBodyLSprite;
         }
-        screen.renderTile(m_x, m_y, snakeSprite);
+        screen.renderTile(xp, yp, snakeSprite);
     }
 
     public void move(int xa, int ya) {
-        px = m_x;
-        py = m_y;
+        px = xp;
+        py = yp;
 
-        if (xa > 0) m_dir = 1;
-        if (xa < 0) m_dir = 3;
-        if (ya > 0) m_dir = 2;
-        if (ya < 0) m_dir = 0;
+        if (xa > 0) dir = 1;
+        if (xa < 0) dir = 3;
+        if (ya > 0) dir = 2;
+        if (ya < 0) dir = 0;
 
-        m_x += xa;
-        m_y += ya;
+        xp += xa;
+        yp += ya;
     }
 
 }

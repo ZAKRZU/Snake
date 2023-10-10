@@ -11,3 +11,5 @@ Eat apples to earn points. Each apple eaten increases the length of the snake.
 * Maps are tile based
 * Highscore table
 * Eating apples extends snake size
+
+Thanks for my sister for making very simple snake and apple graphics in 15 minutes ❤️

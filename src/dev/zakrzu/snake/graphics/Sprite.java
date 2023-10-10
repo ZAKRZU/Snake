@@ -3,9 +3,9 @@ package dev.zakrzu.snake.graphics;
 public class Sprite {
     
     public static final int SIZE = 16;
-    private int m_size;
-    private int m_x, m_y;
-    private int[] m_pixels;
+    private int size;
+    private int xt, yt; // tile based coordinates
+    private int[] pixels;
 
     public static Sprite grassSprite = new Sprite(0, 0, 16);
     public static Sprite grass2Sprite = new Sprite(3, 0, 16);
@@ -32,22 +32,22 @@ public class Sprite {
     public static Sprite voidSprite = new Sprite(0);
 
     public Sprite(int x, int y, int size) {
-        m_size = size;
-        m_pixels = new int[size * size];
-        m_x = x << 4;
-        m_y = y << 4;
+        this.size = size;
+        pixels = new int[size * size];
+        xt = x << 4;
+        yt = y << 4;
         create(size);
     }
 
     public Sprite(int color) {
-        m_pixels = new int[SIZE * SIZE];
+        pixels = new int[SIZE * SIZE];
         create(SIZE, color);
     }
 
     public void create(int size) {
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
-                m_pixels[x + y * size] = SpriteSheet.getPixels()[(x + m_x) + (y + m_y) * SpriteSheet.SIZE];
+                pixels[x + y * size] = SpriteSheet.getPixels()[(x + xt) + (y + yt) * SpriteSheet.SIZE];
             }
         }
     }
@@ -55,18 +55,18 @@ public class Sprite {
     public void create(int size, int color) {
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
-                m_pixels[x + y * size] = color;
+                pixels[x + y * size] = color;
             }
             
         }
     }
 
     public int[] getPixels() {
-        return m_pixels;
+        return pixels;
     }
 
     public int getSize() {
-        return m_size;
+        return size;
     }
 
 }

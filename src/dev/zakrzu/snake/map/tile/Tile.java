@@ -5,7 +5,7 @@ import dev.zakrzu.snake.graphics.Sprite;
 
 public class Tile {
     
-    private Sprite m_sprite;
+    private Sprite sprite;
 
     public static Tile fakeGrassTile = new FakeGrassTile(Sprite.fakeGrassSprite);
     public static Tile grassTile = new GrassTile(Sprite.grassSprite);
@@ -16,14 +16,14 @@ public class Tile {
     public static Tile voidTile = new VoidTile(Sprite.voidSprite);
 
     public Tile(Sprite sprite) {
-        m_sprite = sprite;
+        this.sprite = sprite;
     }
 
     public Sprite getSprite() {
-        return m_sprite;
+        return sprite;
     }
 
-    public void render(int x, int y, Screen screen) {
+    public void render(int xt, int yt, Screen screen) {
     }
 
     public boolean solid() {

@@ -6,16 +6,16 @@ import dev.zakrzu.snake.input.InputHandler;
 
 public class UI {
     
-    protected InputHandler m_input;
-    protected Game m_game;
+    protected InputHandler input;
+    protected Game game;
     
     public UI(InputHandler input) {
-        m_input = input;
+        this.input = input;
     }
 
     public UI(InputHandler input, Game game) {
-        m_input = input;
-        m_game = game;
+        this.input = input;
+        this.game = game;
     }
 
     public void update() {

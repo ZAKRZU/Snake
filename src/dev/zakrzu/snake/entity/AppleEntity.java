@@ -5,22 +5,22 @@ import dev.zakrzu.snake.graphics.Sprite;
 
 public class AppleEntity extends Entity {
     
-    private Sprite m_sprite = Sprite.appleSprite;
+    private Sprite sprite = Sprite.appleSprite;
 
     public AppleEntity() {
         System.out.println("WARNING: Created apple at X:0 Y:0 (can be off the map!)");
     }
 
     public AppleEntity(int x, int y) {
-        m_x = x;
-        m_y = y;
+        xp = x;
+        yp = y;
     }
 
     public void render(Screen screen) {
-        screen.renderTile(m_x, m_y, m_sprite);
+        screen.renderTile(xp, yp, sprite);
     }
 
     public Sprite getSprite() {
-        return m_sprite;
+        return sprite;
     }
 }

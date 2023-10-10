@@ -5,7 +5,7 @@ import dev.zakrzu.snake.map.Map;
 
 public class Entity {
     
-    protected int m_x = 0, m_y = 0;
+    protected int xp = 0, yp = 0;
     // private int m_health = 100;
     protected Map map;
     // private boolean m_hurt = false;
@@ -31,10 +31,10 @@ public class Entity {
     }
 
     public int getX() {
-        return m_x;
+        return xp;
     }
 
     public int getY() {
-        return m_y;
+        return yp;
     }
 }

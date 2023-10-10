@@ -112,3 +112,4 @@ replay_pid*
 ### Project related files ###
 # Save files
 highscores.dat
+highscores.dat.bak

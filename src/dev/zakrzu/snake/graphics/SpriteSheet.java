@@ -8,14 +8,14 @@ import javax.imageio.ImageIO;
 public class SpriteSheet {
     
     public static final int SIZE = 128;
-    private static int[] m_pixels;
+    private static int[] pixels;
 
     public SpriteSheet(String path) {
         loadSheet(path);
     }
 
     public static int[] getPixels() {
-        return m_pixels;
+        return pixels;
     }
 
     public void loadSheet(String path) {
@@ -23,8 +23,8 @@ public class SpriteSheet {
             BufferedImage image = ImageIO.read(SpriteSheet.class.getResource(path));
             int width = image.getWidth();
             int height = image.getHeight();
-            m_pixels = new int[width * height];
-            image.getRGB(0, 0, width, height, m_pixels, 0, width);
+            pixels = new int[width * height];
+            image.getRGB(0, 0, width, height, pixels, 0, width);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -7,7 +7,6 @@ public class InputHandler implements KeyListener {
 
     private boolean[] keys = new boolean[65536];
     public boolean up, down, left, right, use, back, anyKey;
-    public int x, y;
     public boolean focus = false;
 
     public void update() {

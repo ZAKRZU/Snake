@@ -11,8 +11,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,50 +37,47 @@ public class Game extends Canvas implements Runnable {
     public final static int HEIGHT = WIDTH / 16 * 10;
     public final static int SCALE = 2;
 
-    private final static int RESPAWN_TIME = 30;
+    public boolean paused = false;
 
-    public boolean m_paused = false;
-
-    private Thread m_thread;
-    private boolean m_running = false;
-    private int m_canRespawn = RESPAWN_TIME;
-    private BufferedImage m_image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-    private int[] m_pixels = ((DataBufferInt) m_image.getRaster().getDataBuffer()).getData();
-    private Screen m_screen;
-    private Map m_map;
-    private List<Map> m_mapList = new ArrayList<Map>();
-    private Camera m_camera;
-    private PlayerEntity m_player;
-    private UI m_menu;
-    private HighScore m_highScore;
-    private HighScoreDialog m_highScoreDialog = null;
+    private Thread thread;
+    private boolean running = false;
+    private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+    private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+    private Screen screen;
+    private Map map;
+    private List<Map> mapList = new ArrayList<Map>();
+    private Camera camera;
+    private PlayerEntity player;
+    private UI menu;
+    private HighScore highScore;
+    private HighScoreDialog highScoreDialog = null;
     private static final String SAVE_FILE_NAME = "highscores.dat";
 
-    public InputHandler m_input;
+    public InputHandler input;
 
     public Game() {
         Dimension size = new Dimension(WIDTH * SCALE, HEIGHT * SCALE);
         setPreferredSize(size);
         setMinimumSize(size);
         setMaximumSize(size);
-        m_screen = new Screen(WIDTH, HEIGHT);
-        m_input = new InputHandler();
-        m_menu = new MainMenuUI(m_input, this);
+        screen = new Screen(WIDTH, HEIGHT);
+        input = new InputHandler();
+        menu = new MainMenuUI(input, this);
 
         File highScoreSave = new File(SAVE_FILE_NAME);
         if (highScoreSave.exists() && !highScoreSave.isDirectory()) {
             loadObject();
         } else {
-            m_highScore = new HighScore();
+            highScore = new HighScore();
         }
 
         new SpriteSheet("/sprites.png");
         prepareMaps();
-        m_map = m_mapList.get(0);
-        m_camera = new Camera(m_input);
-        m_camera.setPosition((m_map.getCameraX() << 4) + 8, m_map.getCameraY() << 4);
+        map = mapList.get(0);
+        camera = new Camera(input);
+        camera.setPosition((map.getCameraX() << 4) + 8, map.getCameraY() << 4);
 
-        addKeyListener(m_input);
+        addKeyListener(input);
     }
 
     public void prepareMaps() {
@@ -95,34 +95,34 @@ public class Game extends Canvas implements Runnable {
         // mapDebug.setRespawn(10, 4);
         // mapDebug.setCamera(10, 4);
 
-        m_mapList.add(map1);
-        m_mapList.add(map2);
-        m_mapList.add(map3);
-        // m_mapList.add(mapDebug);
+        mapList.add(map1);
+        mapList.add(map2);
+        mapList.add(map3);
+        // mapList.add(mapDebug);
     }
 
     public void startGame() {
-        m_player = new PlayerEntity(m_map.getRespawnX(), m_map.getRespawnY(), m_input);
-        if (m_map.getCameraFollowsPlayer()) {
-            m_camera.follow(m_player);
+        player = new PlayerEntity(map.getRespawnX(), map.getRespawnY(), input);
+        if (map.getCameraFollowsPlayer()) {
+            camera.follow(player);
         } else {
-            m_camera.setPosition((m_map.getCameraX() << 4) + 8, m_map.getCameraY() << 4);
+            camera.setPosition((map.getCameraX() << 4) + 8, map.getCameraY() << 4);
         }
-        m_map.add(m_player);
-        m_map.regenerateApple();
-        m_menu = null;
+        map.add(player);
+        map.regenerateApple();
+        menu = null;
     }
 
     public void stopGame() {
-        m_map.remove(m_player);
-        m_camera.follow(null);
-        m_camera.setPosition((m_map.getCameraX() << 4) + 8, m_map.getCameraY() << 4);
-        m_player = null;
-        m_menu = new MainMenuUI(m_input, this);
+        map.remove(player);
+        camera.follow(null);
+        camera.setPosition((map.getCameraX() << 4) + 8, map.getCameraY() << 4);
+        player = null;
+        menu = new MainMenuUI(input, this);
     }
 
     public void changeMap(int mapNumber) {
-        m_map = m_mapList.get(mapNumber);
+        map = mapList.get(mapNumber);
     }
 
     public void loadObject() {
@@ -130,12 +130,23 @@ public class Game extends Canvas implements Runnable {
             FileInputStream f = new FileInputStream(new File(SAVE_FILE_NAME));
             ObjectInputStream o = new ObjectInputStream(f);
 
-            m_highScore = (HighScore) o.readObject();
+            highScore = (HighScore) o.readObject();
 
             o.close();
             f.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        } catch (InvalidClassException e) {
+            System.out.println("File that contains high scores is incompatible with current version and cannot be loaded!");
+            System.out.println("Backup of old scores has been created under " + SAVE_FILE_NAME + ".bak");
+            System.out.println(e.getMessage());
+            File oldFile = new File(SAVE_FILE_NAME);
+            try {
+                Files.copy(oldFile.toPath(), (new File(SAVE_FILE_NAME + ".bak")).toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            highScore = new HighScore();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -148,7 +159,7 @@ public class Game extends Canvas implements Runnable {
             FileOutputStream f = new FileOutputStream(new File(SAVE_FILE_NAME));
             ObjectOutputStream o = new ObjectOutputStream(f);
 
-            o.writeObject(m_highScore);
+            o.writeObject(highScore);
 
             o.close();
             f.close();
@@ -160,27 +171,27 @@ public class Game extends Canvas implements Runnable {
     }
 
     public void changeUI(UI ui) {
-        m_menu = ui;
+        menu = ui;
     }
 
     public void start() {
-        if (m_running) {
+        if (running) {
             return;
         }
 
-        m_running = true;
+        running = true;
 
-        m_thread = new Thread(this);
-        m_thread.start();
+        thread = new Thread(this);
+        thread.start();
 
     }
 
     public void stop() {
-        if (!m_running) {
+        if (!running) {
             return;
         }
         saveObject();
-        m_running = false;
+        running = false;
         System.exit(0);
         // ((JFrame)getParent().getParent().getParent().getParent()).dispose();
         // try {
@@ -191,11 +202,11 @@ public class Game extends Canvas implements Runnable {
     }
 
     public List<Map> getMapList() {
-        return m_mapList;
+        return mapList;
     }
 
     public HighScore getHighScore() {
-        return m_highScore;
+        return highScore;
     }
 
     public void render() {
@@ -206,35 +217,35 @@ public class Game extends Canvas implements Runnable {
         }
 
         Graphics g = bs.getDrawGraphics();
-        int xScroll = m_camera.getX() - m_screen.getWidth() / 2;
-        int yScroll = m_camera.getY() - m_screen.getHeight() / 2;
+        int xScroll = camera.getX() - screen.getWidth() / 2;
+        int yScroll = camera.getY() - screen.getHeight() / 2;
 
-        m_screen.setGraphics(g);
-        m_screen.clear();
+        screen.setGraphics(g);
+        screen.clear();
 
-        m_map.render(xScroll, yScroll, m_screen);
+        map.render(xScroll, yScroll, screen);
         for (int i = 0; i < WIDTH * HEIGHT; i++) {
-            m_pixels[i] = m_screen.m_pixels[i];
+            pixels[i] = screen.pixels[i];
         }
-        g.drawImage(m_image, 0, 0, getWidth(), getHeight(), null);
-        if (m_menu != null) {
-            m_menu.render(m_screen);
+        g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+        if (menu != null) {
+            menu.render(screen);
         }
-        if (m_paused) {
-            m_screen.renderText("PAUSED",
+        if (paused) {
+            screen.renderText("PAUSED",
                     ((WIDTH * SCALE) / 2) - 64,
                     ((HEIGHT * SCALE) / 2) - 12,
                     24, 1, 0xffffff);
         }
-        if (m_player != null) {
-            m_screen.renderText("Score: " + m_player.getScore().getScore(), 0, 0, 24, 1, 0xffffff);
-            if (m_player.isDead()) {
-                m_screen.renderText("GAME OVER",
+        if (player != null) {
+            screen.renderText("Score: " + player.getScore().getScore(), 0, 0, 24, 1, 0xffffff);
+            if (player.isDead()) {
+                screen.renderText("GAME OVER",
                         ((WIDTH * SCALE) / 2) - 86,
                         ((HEIGHT * SCALE) / 2) - 12,
                         24, 1, 0xffffff);
-                if (m_player.canRespawn()) {
-                    m_screen.renderText("CLICK ANY KEY TO RESTART", ((WIDTH * SCALE) / 2) - 150,
+                if (player.canRespawn()) {
+                    screen.renderText("CLICK ANY KEY TO RESTART", ((WIDTH * SCALE) / 2) - 150,
                             ((HEIGHT * SCALE) / 2) + 24, 18, 1, 0xffffff);
                 }
             }
@@ -244,48 +255,50 @@ public class Game extends Canvas implements Runnable {
     }
 
     public void update() {
-        m_input.update();
-        if (m_menu != null) {
-            m_menu.update();
+        input.update();
+        if (menu != null) {
+            menu.update();
         }
-        // m_player.update();
-        m_map.update();
-        m_camera.update();
-        if (m_player != null) {
-            if (m_input.back) {
-                m_highScoreDialog.dispose();
-                m_highScoreDialog = null;
+
+        map.update();
+        camera.update();
+        if (player != null) {
+            if (input.back) {
+                if (highScoreDialog != null) {
+                    highScoreDialog.dispose();
+                    highScoreDialog = null;
+                }
                 stopGame();
 
-            } else if (m_player.isDead()) {
-                if (m_highScoreDialog == null) {
-                    if (m_highScore.canAddNewScore(m_player.getScore())) {
-                        m_highScoreDialog = new HighScoreDialog(this, m_player.getScore());
+            } else if (player.isDead()) {
+                if (highScoreDialog == null) {
+                    if (highScore.canAddNewScore(player.getScore())) {
+                        highScoreDialog = new HighScoreDialog(this, player.getScore());
                         return;
                     }
                 } else {
-                    if (m_highScoreDialog.isVisible()) {
+                    if (highScoreDialog.isVisible()) {
                         return;
                     }
                 }
 
-                if (!m_input.anyKey) {
+                if (!input.anyKey) {
                     return;
                 }
 
 
-                if (!m_player.canRespawn()) {
+                if (!player.canRespawn()) {
                     return;
                 }
 
-                m_input.releaseAll();
-                m_highScoreDialog = null;
-                m_map.remove(m_player);
-                m_player = new PlayerEntity(m_map.getRespawnX(), m_map.getRespawnY(), m_input);
-                if (m_map.getCameraFollowsPlayer()) {
-                    m_camera.follow(m_player);
+                input.releaseAll();
+                highScoreDialog = null;
+                map.remove(player);
+                player = new PlayerEntity(map.getRespawnX(), map.getRespawnY(), input);
+                if (map.getCameraFollowsPlayer()) {
+                    camera.follow(player);
                 }
-                m_map.add(m_player);
+                map.add(player);
             }
         }
     }
@@ -299,13 +312,13 @@ public class Game extends Canvas implements Runnable {
         int frames = 0;
         int updates = 0;
         requestFocus();
-        while (m_running) {
+        while (running) {
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
 
             if (delta >= 1) {
-                if (!m_paused) {
+                if (!paused) {
                     update();
                 }
                 updates++;

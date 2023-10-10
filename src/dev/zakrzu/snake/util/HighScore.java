@@ -6,16 +6,16 @@ import java.util.List;
 
 public class HighScore implements Serializable {
     
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     private static final int TOP = 5;
 
-    private List<Score> m_scoreList = new ArrayList<Score>();
+    private List<Score> scoreList = new ArrayList<Score>();
 
     public HighScore() {
     }
 
     public void addNewScore(Score score) {
-        m_scoreList.add(score);
+        scoreList.add(score);
         sortScores();
         cleanOldScores();
     }
@@ -23,34 +23,34 @@ public class HighScore implements Serializable {
     public boolean canAddNewScore(Score score) {
         if (score.getScore() <= 0)
             return false;
-        if (m_scoreList.size() > 0) {
-            if (score.getScore() < m_scoreList.get(0).getScore() && m_scoreList.size() >= TOP) return false;
+        if (scoreList.size() > 0) {
+            if (score.getScore() < scoreList.get(0).getScore() && scoreList.size() >= TOP) return false;
         }
         return true;
     }
 
     public void cleanOldScores() {
-        if (m_scoreList.size() <= TOP) return;
+        if (scoreList.size() <= TOP) return;
         List<Score> topScores = getTopScores();
-        m_scoreList = topScores;
+        scoreList = topScores;
         sortScores();
     }
 
     public List<Score> getAllScores() {
-        return m_scoreList;
+        return scoreList;
     }
 
     public List<Score> getTopScores() {
         List<Score> scores = new ArrayList<Score>();
 
-        int startPoint = m_scoreList.size() - 1;
-        int stopPoint = m_scoreList.size() - TOP;
+        int startPoint = scoreList.size() - 1;
+        int stopPoint = scoreList.size() - TOP;
         if (stopPoint < 1) {
             stopPoint = 0;
         }
 
         for (int i = startPoint; i >= stopPoint; i--) {
-            scores.add(m_scoreList.get(i));
+            scores.add(scoreList.get(i));
         }
 
         return scores;
@@ -89,11 +89,11 @@ public class HighScore implements Serializable {
     }
 
     public void sortScores() {
-        Score arr2[] = m_scoreList.toArray(new Score[0]);
+        Score arr2[] = scoreList.toArray(new Score[0]);
         quickSort(arr2, 0, arr2.length - 1);
-        m_scoreList.clear();
+        scoreList.clear();
         for (int i = 0; i < arr2.length; i++) {
-            m_scoreList.add(arr2[i]);
+            scoreList.add(arr2[i]);
         }
     }
 
